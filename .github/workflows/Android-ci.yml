@@ -1,0 +1,43 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Récupérer le code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Installer JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3  # v3 est plus stable pour Android
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 3️⃣ Installer Android SDK
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 33
+          build-tools: 33.0.2
+
+      # 4️⃣ Donner les permissions à gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # 5️⃣ Construire et tester
+      - name: Run tests
+        run: ./gradlew test
+
+      # 6️⃣ Construire APK
+      - name: Build APK
+        run: ./gradlew assembleDebug
